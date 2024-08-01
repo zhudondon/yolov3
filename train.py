@@ -703,23 +703,26 @@ def main(opt, callbacks=Callbacks()):
     # Evolve hyperparameters (optional)
     else:
         # Hyperparameter evolution metadata (mutation scale 0-1, lower_limit, upper_limit)
+        """ 超参数 
+            e5就是1*（10的5次方）即100000
+        """
         meta = {
             "lr0": (1, 1e-5, 1e-1),  # initial learning rate (SGD=1E-2, Adam=1E-3)
             "lrf": (1, 0.01, 1.0),  # final OneCycleLR learning rate (lr0 * lrf)
-            "momentum": (0.3, 0.6, 0.98),  # SGD momentum/Adam beta1
-            "weight_decay": (1, 0.0, 0.001),  # optimizer weight decay
+            "momentum": (0.3, 0.6, 0.98),  # SGD momentum/Adam beta1 动量 减少抖动
+            "weight_decay": (1, 0.0, 0.001),  # optimizer weight decay 权重衰退 减少权重 对学习的影响,达到学习抽象泛化 能识别更多的
             "warmup_epochs": (1, 0.0, 5.0),  # warmup epochs (fractions ok)
-            "warmup_momentum": (1, 0.0, 0.95),  # warmup initial momentum
-            "warmup_bias_lr": (1, 0.0, 0.2),  # warmup initial bias lr
-            "box": (1, 0.02, 0.2),  # box loss gain
-            "cls": (1, 0.2, 4.0),  # cls loss gain
-            "cls_pw": (1, 0.5, 2.0),  # cls BCELoss positive_weight
-            "obj": (1, 0.2, 4.0),  # obj loss gain (scale with pixels)
-            "obj_pw": (1, 0.5, 2.0),  # obj BCELoss positive_weight
-            "iou_t": (0, 0.1, 0.7),  # IoU training threshold
-            "anchor_t": (1, 2.0, 8.0),  # anchor-multiple threshold
-            "anchors": (2, 2.0, 10.0),  # anchors per output grid (0 to ignore)
-            "fl_gamma": (0, 0.0, 2.0),  # focal loss gamma (efficientDet default gamma=1.5)
+            "warmup_momentum": (1, 0.0, 0.95),  # warmup initial momentum 初始化动量
+            "warmup_bias_lr": (1, 0.0, 0.2),  # warmup initial bias lr 初始化 偏执和学习率
+            "box": (1, 0.02, 0.2),  # box loss gain 识别框的损失得分
+            "cls": (1, 0.2, 4.0),  # cls loss gain  分类损失（‌Classification Loss）‌得分
+            "cls_pw": (1, 0.5, 2.0),  # cls BCELoss positive_weight 分类损失交叉熵 积极权重  二元交叉熵(Binary CrossEntropy)
+            "obj": (1, 0.2, 4.0),  # obj loss gain (scale with pixels) 目标损失得分
+            "obj_pw": (1, 0.5, 2.0),  # obj BCELoss positive_weight 目标交叉熵 积极权重
+            "iou_t": (0, 0.1, 0.7),  # IoU training threshold iou训练阈值
+            "anchor_t": (1, 2.0, 8.0),  # anchor-multiple threshold 先验框多阈值
+            "anchors": (2, 2.0, 10.0),  # anchors per output grid (0 to ignore) 先验框 输出方格
+            "fl_gamma": (0, 0.0, 2.0),  # focal loss gamma (efficientDet default gamma=1.5) Focal Loss是一种损失函数，‌旨在解决分类问题中类别不平衡和模型训练过程中的样本难易程度问题。‌
             "hsv_h": (1, 0.0, 0.1),  # image HSV-Hue augmentation (fraction)
             "hsv_s": (1, 0.0, 0.9),  # image HSV-Saturation augmentation (fraction)
             "hsv_v": (1, 0.0, 0.9),  # image HSV-Value augmentation (fraction)
