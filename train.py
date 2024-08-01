@@ -575,42 +575,74 @@ def parse_opt(known=False):
     parser.add_argument("--cfg", type=str, default="", help="model.yaml path")
     # 数据集 例如coco数据集
     parser.add_argument("--data", type=str, default=ROOT / "data/coco128.yaml", help="dataset.yaml path")
-    #
+    """ 超参数 """
     parser.add_argument("--hyp", type=str, default=ROOT / "data/hyps/hyp.scratch-low.yaml", help="hyperparameters path")
+    # 总代数
     parser.add_argument("--epochs", type=int, default=100, help="total training epochs")
+    # 批次大小每个gpu的训练批次大小
     parser.add_argument("--batch-size", type=int, default=16, help="total batch size for all GPUs, -1 for autobatch")
+    # 图片大小 默认640
     parser.add_argument("--imgsz", "--img", "--img-size", type=int, default=640, help="train, val image size (pixels)")
+    # 矩形
     parser.add_argument("--rect", action="store_true", help="rectangular training")
+    # 重新开始
     parser.add_argument("--resume", nargs="?", const=True, default=False, help="resume most recent training")
+    # 存储规则，最后校验点才报错
     parser.add_argument("--nosave", action="store_true", help="only save final checkpoint")
+    # 最后一代 才校验
     parser.add_argument("--noval", action="store_true", help="only validate final epoch")
+    # 没有自动先验框
     parser.add_argument("--noautoanchor", action="store_true", help="disable AutoAnchor")
+    # 主要作用是防止在程序运行过程中生成不必要的图形界面文件
     parser.add_argument("--noplots", action="store_true", help="save no plot files")
+    # 调整 超参数 多少代之后进行
     parser.add_argument("--evolve", type=int, nargs="?", const=300, help="evolve hyperparameters for x generations")
+    # Google Cloud Storage（‌GCS）‌
     parser.add_argument("--bucket", type=str, default="", help="gsutil bucket")
+    # 图片缓存
     parser.add_argument("--cache", type=str, nargs="?", const="ram", help="image --cache ram/disk")
+    # 图片权重
     parser.add_argument("--image-weights", action="store_true", help="use weighted image selection for training")
+    # 设备
     parser.add_argument("--device", default="", help="cuda device, i.e. 0 or 0,1,2,3 or cpu")
+    # 多个缩放比例
     parser.add_argument("--multi-scale", action="store_true", help="vary img-size +/- 50%%")
+    # 当做一个类别
     parser.add_argument("--single-cls", action="store_true", help="train multi-class data as single-class")
+    # 优化器 随机梯度下降，adam
     parser.add_argument("--optimizer", type=str, choices=["SGD", "Adam", "AdamW"], default="SGD", help="optimizer")
+    # 使用同步 批量正则化，只支持在分布式环境
     parser.add_argument("--sync-bn", action="store_true", help="use SyncBatchNorm, only available in DDP mode")
+    # 多线程数据加载器 分布式环境
     parser.add_argument("--workers", type=int, default=8, help="max dataloader workers (per RANK in DDP mode)")
+    # 项目根目录
     parser.add_argument("--project", default=ROOT / "runs/train", help="save to project/name")
+    # 项目名称
     parser.add_argument("--name", default="exp", help="save to project/name")
+    # 不创建
     parser.add_argument("--exist-ok", action="store_true", help="existing project/name ok, do not increment")
-    parser.add_argument("--quad", action="store_true", help="quad dataloader")
+    # 是否 用大规模数据工具
+    parser.add_argument("--quad", action="store_true", help="quad")
+    # 余弦 学习率调度器
     parser.add_argument("--cos-lr", action="store_true", help="cosine LR scheduler")
+    # 使标签更为平滑
     parser.add_argument("--label-smoothing", type=float, default=0.0, help="Label smoothing epsilon")
+    # 如果没有训练效果，多久才停止
     parser.add_argument("--patience", type=int, default=100, help="EarlyStopping patience (epochs without improvement)")
+    # 冻结 层数，自己训练自己的参数
     parser.add_argument("--freeze", nargs="+", type=int, default=[0], help="Freeze layers: backbone=10, first3=0 1 2")
+    # 多少个代进行保存
     parser.add_argument("--save-period", type=int, default=-1, help="Save checkpoint every x epochs (disabled if < 1)")
+    # 全局训练种子 使用的随机过程（‌如数据洗牌、‌随机裁剪等）‌具有一致的结果，‌从而使得每次训练都是确定性的。‌这对于研究和开发来说是非常有用的，‌
     parser.add_argument("--seed", type=int, default=0, help="Global training seed")
+    #
     parser.add_argument("--local_rank", type=int, default=-1, help="Automatic DDP Multi-GPU argument, do not modify")
 
     # Logger arguments
     parser.add_argument("--entity", default=None, help="Entity")
+    # 上传数据集
     parser.add_argument("--upload_dataset", nargs="?", const=True, default=False, help='Upload data, "val" option')
+    # 定时记录 框框
     parser.add_argument("--bbox_interval", type=int, default=-1, help="Set bounding-box image logging interval")
     parser.add_argument("--artifact_alias", type=str, default="latest", help="Version of dataset artifact to use")
 
