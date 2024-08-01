@@ -99,7 +99,7 @@ RANK = int(os.getenv("RANK", -1))
 WORLD_SIZE = int(os.getenv("WORLD_SIZE", 1))
 GIT_INFO = check_git_info()
 
-
+# 训练本身
 def train(hyp, opt, device, callbacks):  # hyp is path/to/hyp.yaml or hyp dictionary
     """
     Train a YOLOv3 model on a custom dataset and manage the training process.
@@ -164,14 +164,15 @@ def train(hyp, opt, device, callbacks):  # hyp is path/to/hyp.yaml or hyp dictio
         opt.workers,
         opt.freeze,
     )
+    # 回调，执行
     callbacks.run("on_pretrain_routine_start")
 
-    # Directories
+    # Directories 权重目录
     w = save_dir / "weights"  # weights dir
     (w.parent if evolve else w).mkdir(parents=True, exist_ok=True)  # make dir
     last, best = w / "last.pt", w / "best.pt"
 
-    # Hyperparameters
+    # Hyperparameters 超参数
     if isinstance(hyp, str):
         with open(hyp, errors="ignore") as f:
             hyp = yaml.safe_load(f)  # load hyps dict
@@ -183,37 +184,45 @@ def train(hyp, opt, device, callbacks):  # hyp is path/to/hyp.yaml or hyp dictio
         yaml_save(save_dir / "hyp.yaml", hyp)
         yaml_save(save_dir / "opt.yaml", vars(opt))
 
-    # Loggers
+    # Loggers 日志
     data_dict = None
     if RANK in {-1, 0}:
         loggers = Loggers(save_dir, weights, opt, hyp, LOGGER)  # loggers instance
 
-        # Register actions
+        # Register actions 注册动作
         for k in methods(loggers):
             callbacks.register_action(k, callback=getattr(loggers, k))
 
         # Process custom dataset artifact link
         data_dict = loggers.remote_dataset
-        if resume:  # If resuming runs from remote artifact
+        if resume:  # If resuming runs from remote artifact 从远程恢复
             weights, epochs, hyp, batch_size = opt.weights, opt.epochs, opt.hyp, opt.batch_size
 
-    # Config
+    # Config 配置
     plots = not evolve and not opt.noplots  # create plots
     cuda = device.type != "cpu"
     init_seeds(opt.seed + 1 + RANK, deterministic=True)
     with torch_distributed_zero_first(LOCAL_RANK):
         data_dict = data_dict or check_dataset(data)  # check if None
+    # 数据集  训练数据集和验证数据集的路径
     train_path, val_path = data_dict["train"], data_dict["val"]
+    # 分类数量
     nc = 1 if single_cls else int(data_dict["nc"])  # number of classes
-    names = {0: "item"} if single_cls and len(data_dict["names"]) != 1 else data_dict["names"]  # class names
-    is_coco = isinstance(val_path, str) and val_path.endswith("coco/val2017.txt")  # COCO dataset
+    # 分类名称
+    names = {0: "item"} if single_cls and len(data_dict["names"]) != 1 else data_dict["names"]  # class names 分类名称
+    # 是否是coco数据集
+    is_coco = isinstance(val_path, str) and val_path.endswith("coco/val2017.txt")  # COCO dataset coco数据集
 
-    # Model
+    # Model 检测权重文件
     check_suffix(weights, ".pt")  # check weights
+    # 预训练权重
     pretrained = weights.endswith(".pt")
     if pretrained:
+        # torch_distributed_zero_first 通过实现分布式训练中的进程同步，‌确保了数据加载和处理的同步性，‌提高了训练的稳定性和可靠性
+        # 尝试下载权重
         with torch_distributed_zero_first(LOCAL_RANK):
             weights = attempt_download(weights)  # download if not found locally
+        # 加载权重到cpu，避免cuda
         ckpt = torch.load(weights, map_location="cpu")  # load checkpoint to CPU to avoid CUDA memory leak
         model = Model(cfg or ckpt["model"].yaml, ch=3, nc=nc, anchors=hyp.get("anchors")).to(device)  # create
         exclude = ["anchor"] if (cfg or hyp.get("anchors")) and not resume else []  # exclude keys
@@ -688,21 +697,29 @@ def main(opt, callbacks=Callbacks()):
         check_git_status()
         check_requirements(ROOT / "requirements.txt")
 
+    """ 恢复训练 指定一个point 或者最近的 
+        opt.resume 是一个文件路径 
+    """
     # Resume (from specified or most recent last.pt)
     if opt.resume and not check_comet_resume(opt) and not opt.evolve:
+        # 从文件读取，否则 自动获取恢复点 get_latest_run 搜索文件.pt 获取时间最晚的
         last = Path(check_file(opt.resume) if isinstance(opt.resume, str) else get_latest_run())
+        # 训练配置文件
         opt_yaml = last.parent.parent / "opt.yaml"  # train options yaml
         opt_data = opt.data  # original dataset
         if opt_yaml.is_file():
+            # 如果有配置信息的 配置文件，就从这里加载
             with open(opt_yaml, errors="ignore") as f:
                 d = yaml.safe_load(f)
         else:
+            # 加载 最新训练的环境配置
             d = torch.load(last, map_location="cpu")["opt"]
         opt = argparse.Namespace(**d)  # replace
-        opt.cfg, opt.weights, opt.resume = "", str(last), True  # reinstate
+        opt.cfg, opt.weights, opt.resume = "", str(last), True  # reinstate 使恢复
         if is_url(opt_data):
-            opt.data = check_file(opt_data)  # avoid HUB resume auth timeout
+            opt.data = check_file(opt_data)  # avoid HUB resume auth timeout 远程数据
     else:
+        # 新创建一个训练项目 ，从传入配置yaml 初始化，返回真正的数据结构，例如权重，项目信息
         opt.data, opt.cfg, opt.hyp, opt.weights, opt.project = (
             check_file(opt.data),
             check_yaml(opt.cfg),
@@ -710,8 +727,9 @@ def main(opt, callbacks=Callbacks()):
             str(opt.weights),
             str(opt.project),
         )  # checks
-        assert len(opt.cfg) or len(opt.weights), "either --cfg or --weights must be specified"
+        assert len(opt.cfg) or len(opt.weights), "either --cfg or --weights must be specified" # 必传
         if opt.evolve:
+            # 如果是要更新 超参数
             if opt.project == str(ROOT / "runs/train"):  # if default project name, rename to runs/evolve
                 opt.project = str(ROOT / "runs/evolve")
             opt.exist_ok, opt.resume = opt.resume, False  # pass resume to exist_ok and disable resume
@@ -719,7 +737,7 @@ def main(opt, callbacks=Callbacks()):
             opt.name = Path(opt.cfg).stem  # use model.yaml as name
         opt.save_dir = str(increment_path(Path(opt.project) / opt.name, exist_ok=opt.exist_ok))
 
-    # DDP mode
+    # DDP mode 分布式训练
     device = select_device(opt.device, batch_size=opt.batch_size)
     if LOCAL_RANK != -1:
         msg = "is not compatible with YOLOv3 Multi-GPU DDP training"
@@ -732,7 +750,7 @@ def main(opt, callbacks=Callbacks()):
         device = torch.device("cuda", LOCAL_RANK)
         dist.init_process_group(backend="nccl" if dist.is_nccl_available() else "gloo")
 
-    # Train
+    # Train 如果不训练超参数，直接开始训练
     if not opt.evolve:
         train(opt.hyp, opt, device, callbacks)
 
@@ -770,7 +788,7 @@ def main(opt, callbacks=Callbacks()):
             "mixup": (1, 0.0, 1.0),  # image mixup (probability)
             "copy_paste": (1, 0.0, 1.0),
         }  # segment copy-paste (probability)
-
+        """ 类似 try catch 忽略错误 """
         with open(opt.hyp, errors="ignore") as f:
             hyp = yaml.safe_load(f)  # load hyps dict
             if "anchors" not in hyp:  # anchors commented in hyp.yaml
@@ -780,6 +798,7 @@ def main(opt, callbacks=Callbacks()):
         opt.noval, opt.nosave, save_dir = True, True, Path(opt.save_dir)  # only val/save final epoch
         # ei = [isinstance(x, (int, float)) for x in hyp.values()]  # evolvable indices
         evolve_yaml, evolve_csv = save_dir / "hyp_evolve.yaml", save_dir / "evolve.csv"
+        # google bucket 不需要
         if opt.bucket:
             # download evolve.csv if exists
             subprocess.run(
@@ -791,14 +810,16 @@ def main(opt, callbacks=Callbacks()):
                 ]
             )
 
+        # 遍历 超参数 自动化地调整这些超参数，‌以优化模型的训练效果
         for _ in range(opt.evolve):  # generations to evolve
-            if evolve_csv.exists():  # if evolve.csv exists: select best hyps and mutate
+            if evolve_csv.exists():  # if evolve.csv exists: select best hyps and mutate 选取最好的超参数
                 # Select parent(s)
                 parent = "single"  # parent selection method: 'single' or 'weighted'
+                # 加载参数文件
                 x = np.loadtxt(evolve_csv, ndmin=2, delimiter=",", skiprows=1)
                 n = min(5, len(x))  # number of previous results to consider
-                x = x[np.argsort(-fitness(x))][:n]  # top n mutations
-                w = fitness(x) - fitness(x).min() + 1e-6  # weights (sum > 0)
+                x = x[np.argsort(-fitness(x))][:n]  # top n mutations 最优
+                w = fitness(x) - fitness(x).min() + 1e-6  # weights (sum > 0) 计算模型权重最优参数
                 if parent == "single" or len(x) == 1:
                     # x = x[random.randint(0, n - 1)]  # random selection
                     x = x[random.choices(range(n), weights=w)[0]]  # weighted selection
@@ -823,10 +844,11 @@ def main(opt, callbacks=Callbacks()):
                 hyp[k] = min(hyp[k], v[2])  # upper limit
                 hyp[k] = round(hyp[k], 5)  # significant digits
 
-            # Train mutation
+            # Train mutation 训练调整
             results = train(hyp.copy(), opt, device, callbacks)
+            # 回调
             callbacks = Callbacks()
-            # Write mutation results
+            # Write mutation results 写变化结果
             keys = (
                 "metrics/precision",
                 "metrics/recall",
@@ -836,9 +858,10 @@ def main(opt, callbacks=Callbacks()):
                 "val/obj_loss",
                 "val/cls_loss",
             )
+            # 打印调整 变化
             print_mutation(keys, results, hyp.copy(), save_dir, opt.bucket)
 
-        # Plot results
+        # Plot results 画图
         plot_evolve(evolve_csv)
         LOGGER.info(
             f'Hyperparameter evolution finished {opt.evolve} generations\n'
