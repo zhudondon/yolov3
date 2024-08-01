@@ -3,32 +3,32 @@
 # python train.py --batch 64 --cfg yolov5n6.yaml --weights '' --data coco.yaml --img 640 --epochs 300 --linear
 # See tutorials for hyperparameter evolution https://github.com/ultralytics/yolov5#tutorials
 
-lr0: 0.01 # initial learning rate (SGD=1E-2, Adam=1E-3)
-lrf: 0.01 # final OneCycleLR learning rate (lr0 * lrf)
-momentum: 0.937 # SGD momentum/Adam beta1
-weight_decay: 0.0005 # optimizer weight decay 5e-4
-warmup_epochs: 3.0 # warmup epochs (fractions ok)
-warmup_momentum: 0.8 # warmup initial momentum
-warmup_bias_lr: 0.1 # warmup initial bias lr
-box: 0.05 # box loss gain
-cls: 0.5 # cls loss gain
-cls_pw: 1.0 # cls BCELoss positive_weight
-obj: 1.0 # obj loss gain (scale with pixels)
-obj_pw: 1.0 # obj BCELoss positive_weight
-iou_t: 0.20 # IoU training threshold
-anchor_t: 4.0 # anchor-multiple threshold
+lr0: 0.01 # initial learning rate (SGD=1E-2, Adam=1E-3) 初始化学习率
+lrf: 0.01 # final OneCycleLR learning rate (lr0 * lrf) 周期学习率，用于调整学习率，跳出局部最优解，提高收敛速度
+momentum: 0.937 # SGD momentum/Adam beta1  动量，减少震荡
+weight_decay: 0.0005 # optimizer weight decay 5e-4 权重衰减 5*10-4次方，为了降低权重，泛化学习效果，提高抽象能力
+warmup_epochs: 3.0 # warmup epochs (fractions ok) 初始化代数
+warmup_momentum: 0.8 # warmup initial momentum 初始化动量
+warmup_bias_lr: 0.1 # warmup initial bias lr 初始化偏置学习率
+box: 0.05 # box loss gain 识别框 损益值
+cls: 0.5 # cls loss gain 分类损失（‌cls loss）‌的增益系数 loss gain = 损益 cls 分类
+cls_pw: 1.0 # cls BCELoss positive_weight 分类 二元交叉熵损失 正样本权重
+obj: 1.0 # obj loss gain (scale with pixels) 目标损益
+obj_pw: 1.0 # obj BCELoss positive_weight 目标二院交叉熵 正样本权重
+iou_t: 0.20 # IoU training threshold iou训练阈值
+anchor_t: 4.0 # anchor-multiple threshold 多先验框阈值
 # anchors: 3  # anchors per output layer (0 to ignore)
-fl_gamma: 0.0 # focal loss gamma (efficientDet default gamma=1.5)
-hsv_h: 0.015 # image HSV-Hue augmentation (fraction)
+fl_gamma: 0.0 # focal loss gamma (efficientDet default gamma=1.5) 样品复杂程度进行调整
+hsv_h: 0.015 # image HSV-Hue augmentation (fraction) Hue（‌色调）‌、‌Saturation（‌饱和度）‌和Value（‌明度）‌
 hsv_s: 0.7 # image HSV-Saturation augmentation (fraction)
 hsv_v: 0.4 # image HSV-Value augmentation (fraction)
-degrees: 0.0 # image rotation (+/- deg)
-translate: 0.1 # image translation (+/- fraction)
-scale: 0.5 # image scale (+/- gain)
-shear: 0.0 # image shear (+/- deg)
-perspective: 0.0 # image perspective (+/- fraction), range 0-0.001
-flipud: 0.0 # image flip up-down (probability)
-fliplr: 0.5 # image flip left-right (probability)
-mosaic: 1.0 # image mosaic (probability)
-mixup: 0.0 # image mixup (probability)
-copy_paste: 0.0 # segment copy-paste (probability)
+degrees: 0.0 # image rotation (+/- deg) 旋转角度
+translate: 0.1 # image translation (+/- fraction) 转换
+scale: 0.5 # image scale (+/- gain) 缩放
+shear: 0.0 # image shear (+/- deg) 裁剪
+perspective: 0.0 # image perspective (+/- fraction), range 0-0.001 透视
+flipud: 0.0 # image flip up-down (probability) 反转 上下
+fliplr: 0.5 # image flip left-right (probability) 反转 左右
+mosaic: 1.0 # image mosaic (probability) 马赛克
+mixup: 0.0 # image mixup (probability) 噪声
+copy_paste: 0.0 # segment copy-paste (probability) 复制粘贴
