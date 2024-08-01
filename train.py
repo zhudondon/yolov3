@@ -569,9 +569,13 @@ def parse_opt(known=False):
         * Training Tutorial: https://docs.ultralytics.com/yolov5/tutorials/train_custom_data
     """
     parser = argparse.ArgumentParser()
+    # 初始化权重
     parser.add_argument("--weights", type=str, default=ROOT / "yolov3-tiny.pt", help="initial weights path")
+    # 配置文件 配置了网络的层级
     parser.add_argument("--cfg", type=str, default="", help="model.yaml path")
+    # 数据集 例如coco数据集
     parser.add_argument("--data", type=str, default=ROOT / "data/coco128.yaml", help="dataset.yaml path")
+    #
     parser.add_argument("--hyp", type=str, default=ROOT / "data/hyps/hyp.scratch-low.yaml", help="hyperparameters path")
     parser.add_argument("--epochs", type=int, default=100, help="total training epochs")
     parser.add_argument("--batch-size", type=int, default=16, help="total batch size for all GPUs, -1 for autobatch")
@@ -873,5 +877,9 @@ def run(**kwargs):
 
 
 if __name__ == "__main__":
+    """
+    讲命令行参数 解析成 普通参数，传入main方法
+    一般来说，main方法 可以通过命令行启动，传入参数
+    """
     opt = parse_opt()
     main(opt)
