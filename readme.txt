@@ -12,8 +12,8 @@ AssertionError: mydata\weight\yolov3.weights acceptable suffix is
 
 
 加入自己的数据集
-下载voc_label转换的代码
-https://pjreddie.com/media/files/voc_label.py
+下载voc_label转换的代码 https://pjreddie.com/media/files/voc_label.py
+可以不用，用下面那个create_voc_file
 
 运行该文件，我们的目录下会生成三个txt文件2007_train.txt,2007_val.txt,2007_test.txt，VOCdevkit下的VOC2007也会多生成一个labels文件夹，
 下面是真正会使用到的label，点开看发现已经转化成YOLOV3需要的格式了。这时候自己的数据集正式完成。
@@ -36,4 +36,10 @@ voc.yaml
 
 
 
+错误：
+OMP: Error #15: Initializing libiomp5md.dll, but found libiomp5md.dll already initialized.
+OMP: Hint This means that multiple copies of the OpenMP runtime have been linked into the program. That is dangerous
+you can set the environment variable KMP_DUPLICATE_LIB_OK=TRUE to allow the program to continue to execute
 
+解决
+os.environ['KMP_DUPLICATE_LIB_OK']='TRUE'
