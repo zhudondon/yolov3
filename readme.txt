@@ -5,4 +5,6 @@ pip install ultralytics==8.1.0
 报错信息
 assert s in suffix, f"{msg}{f} acceptable suffix is {suffix}"
 AssertionError: mydata\weight\yolov3.weights acceptable suffix is
+手贱改了文件，应该是.pt结尾的
+
 
