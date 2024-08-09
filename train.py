@@ -647,7 +647,7 @@ def parse_opt(known=False):
     # 使用同步 批量正则化，只支持在分布式环境
     parser.add_argument("--sync-bn", action="store_true", help="use SyncBatchNorm, only available in DDP mode")
     # 多线程数据加载器 分布式环境 这里多线程要少一点，不然容易崩 DLL load failed while importing _cdflib: 页面文件太小，无法完成操作
-    parser.add_argument("--workers", type=int, default=1, help="max dataloader workers (per RANK in DDP mode)")
+    parser.add_argument("--workers", type=int, default=4, help="max dataloader workers (per RANK in DDP mode)")
     # 项目根目录
     parser.add_argument("--project", default=ROOT / "runs/train", help="save to project/name")
     # 项目名称
