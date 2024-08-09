@@ -1,0 +1,9 @@
+D:\Users\Administrator\python\yolov3/mydata/VOC2007/JPEGImages/1723086510857.jpg
+D:\Users\Administrator\python\yolov3/mydata/VOC2007/JPEGImages/1723086726218.jpg
+D:\Users\Administrator\python\yolov3/mydata/VOC2007/JPEGImages/1723086871556.jpg
+D:\Users\Administrator\python\yolov3/mydata/VOC2007/JPEGImages/1723087211158.jpg
+D:\Users\Administrator\python\yolov3/mydata/VOC2007/JPEGImages/1723087863690.jpg
+D:\Users\Administrator\python\yolov3/mydata/VOC2007/JPEGImages/1723087947618.jpg
+D:\Users\Administrator\python\yolov3/mydata/VOC2007/JPEGImages/1723088171465.jpg
+D:\Users\Administrator\python\yolov3/mydata/VOC2007/JPEGImages/1723088208171.jpg
+D:\Users\Administrator\python\yolov3/mydata/VOC2007/JPEGImages/1723088375591.jpg
