@@ -24,7 +24,7 @@ classes = ["glass","mouth"]
 
 
 create_voc_file.py
-调用脚本，把voc格式转成yolo格式，会创建 2007_train.cache 2007_train.cache.npy
+调用脚本，把voc格式转成yolo格式，会创建
 images 的结构
 
 
