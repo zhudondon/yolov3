@@ -1,0 +1,26 @@
+<annotation>
+	<folder>glass</folder>
+	<filename>1723087840893.jpg</filename>
+	<path>E:\train\glass\1723087840893.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>358</width>
+		<height>309</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>glass</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>22</xmin>
+			<ymin>74</ymin>
+			<xmax>338</xmax>
+			<ymax>226</ymax>
+		</bndbox>
+	</object>
+</annotation>
