@@ -646,7 +646,7 @@ def parse_opt(known=False):
     parser.add_argument("--optimizer", type=str, choices=["SGD", "Adam", "AdamW"], default="SGD", help="optimizer")
     # 使用同步 批量正则化，只支持在分布式环境
     parser.add_argument("--sync-bn", action="store_true", help="use SyncBatchNorm, only available in DDP mode")
-    # 多线程数据加载器 分布式环境
+    # 多线程数据加载器 分布式环境 这里多线程要少一点，不然容易崩
     parser.add_argument("--workers", type=int, default=8, help="max dataloader workers (per RANK in DDP mode)")
     # 项目根目录
     parser.add_argument("--project", default=ROOT / "runs/train", help="save to project/name")
