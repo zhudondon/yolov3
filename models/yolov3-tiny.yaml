@@ -1,18 +1,26 @@
 # Ultralytics YOLOv3 🚀, AGPL-3.0 license
 
 # Parameters
-nc: 80 # number of classes
+#nc: 80 # number of classes
+nc: 2
 depth_multiple: 1.0 # model depth multiple
 width_multiple: 1.0 # layer channel multiple
 anchors:
-  - [10, 14, 23, 27, 37, 58] # P4/16
+  - [10, 14, 23, 27, 37, 58] # P4/16 框的
   - [81, 82, 135, 169, 344, 319] # P5/32
 
 # YOLOv3-tiny backbone
 backbone:
   # [from, number, module, args]
   [
-    [-1, 1, Conv, [16, 3, 1]], # 0
+    # from：其值为网络层索引 (一个或多个，-1表示上一个网络层)，将对应网络层的输出作为 forward 函数的参数
+    # number：网络单元串联深度 / 对应卷积单元的参数 n (BottleneckCSP, C3, C3TR, C3Ghost)
+    # module：对应 models.common / torch.nn 中的卷积单元名称
+    # args：无需 c1 (输入通道数) 和 n (前文的 number)。对于 Conv、DWConv、GhostConv、GhostBottleneck、Focus 而言，第三个参数为 s (卷积步长)
+
+    #nn.conv 通道数（in_channels）、输出通道数（out_channels）、卷积核大小（kernel_size）、步长（stride）、填充方式（padding）、填充量（padding）、空洞卷积（dilation）和偏差项（bias）。
+
+    [-1, 1, Conv, [16, 3, 1]], # 0    from = -1表示来自上一层 [-1,6] 表示来着-1,6层； number ；module 模块方法； args 方法的参数 输出 16*16，核形状3*3，步长=1
     [-1, 1, nn.MaxPool2d, [2, 2, 0]], # 1-P1/2
     [-1, 1, Conv, [32, 3, 1]],
     [-1, 1, nn.MaxPool2d, [2, 2, 0]], # 3-P2/4

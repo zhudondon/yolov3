@@ -1,0 +1,2 @@
+D:\Users\Administrator\python\yolov3/mydata/VOC2007/JPEGImages/1723088214563.jpg
+D:\Users\Administrator\python\yolov3/mydata/VOC2007/JPEGImages/1723088400580.jpg

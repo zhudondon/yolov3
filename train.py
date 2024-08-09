@@ -606,7 +606,8 @@ def parse_opt(known=False):
     # 配置文件 配置了网络的层级
     parser.add_argument("--cfg", type=str, default="", help="model.yaml path")
     # 数据集 例如coco数据集
-    parser.add_argument("--data", type=str, default=ROOT / "data/coco128.yaml", help="dataset.yaml path")
+   # parser.add_argument("--data", type=str, default=ROOT / "data/coco128.yaml", help="dataset.yaml path")
+    parser.add_argument("--data", type=str, default=ROOT / "data/voc.yaml")
     """ 超参数 """
     parser.add_argument("--hyp", type=str, default=ROOT / "data/hyps/hyp.scratch-low.yaml", help="hyperparameters path")
     # 总代数
