@@ -22,7 +22,8 @@ https://pjreddie.com/media/files/voc_label.py
 # train glass和mouth
 classes = ["glass","mouth"]
 
-
+# 必须手写 或者读取文件
+classes = ['glass', 'mouth']
 create_voc_file.py
 调用脚本，把voc格式转成yolo格式，会创建
 images 的结构

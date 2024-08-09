@@ -6,7 +6,8 @@ from tqdm import tqdm
 import shutil
 import cv2
 
-classes = []
+# 必须手写 或者读取文件
+classes = ['glass', 'mouth']
 
 # 训练集 验证集 测试集比例
 train_k = 0.8
@@ -29,62 +30,62 @@ def clear_hidden_files(path):
             clear_hidden_files(abspath)
 
 
-# def convert(size, box):
-#     dw = 1. / size[0]
-#     dh = 1. / size[1]
-#     x = (box[0] + box[1]) / 2.0
-#     y = (box[2] + box[3]) / 2.0
-#     w = box[1] - box[0]
-#     h = box[3] - box[2]
-#     x = x * dw
-#     w = w * dw
-#     y = y * dh
-#     h = h * dh
-#     return (x, y, w, h)
+def convert(size, box):
+    dw = 1. / size[0]
+    dh = 1. / size[1]
+    x = (box[0] + box[1]) / 2.0
+    y = (box[2] + box[3]) / 2.0
+    w = box[1] - box[0]
+    h = box[3] - box[2]
+    x = x * dw
+    w = w * dw
+    y = y * dh
+    h = h * dh
+    return (x, y, w, h)
 
 
-# def convert_annotation(label_path, xml_path):
-#     try:
-#         in_file = open(xml_path, 'r', encoding='utf-8')
-#         out_file = open(label_path, 'w')
-#         #     print(xml_path)
-#         out_tmp = set()
-#         tree = ET.parse(in_file)
-#         root = tree.getroot()
-#     except:
-#         in_file = open(xml_path, 'r')
-#         out_file = open(label_path, 'w')
-#         #     print(xml_path)
-#         out_tmp = set()
-#         tree = ET.parse(in_file)
-#         root = tree.getroot()
-#     size = root.find('size')
-#     w = int(size.find('width').text)
-#     h = int(size.find('height').text)
-#
-#     if w <= 0 or h <= 0:
-#         tmp_img_path = xml_path.split('.')[0].split('/')[-1]
-#         tmp_img = cv2.imread(os.path.join(dirs, 'JPEGImages', tmp_img_path + '.jpg'))
-#         h, w, c = tmp_img.shape
-#
-#     for obj in root.iter('object'):
-#         difficult = obj.find('difficult').text
-#         cls = obj.find('name').text
-#         if cls not in classes or int(difficult) == 1:
-#             continue
-#         cls_id = classes.index(cls)
-#         xmlbox = obj.find('bndbox')
-#         b = (float(xmlbox.find('xmin').text), float(xmlbox.find('xmax').text), float(xmlbox.find('ymin').text),
-#              float(xmlbox.find('ymax').text))
-#         bb = convert((w, h), b)
-#         out_tmp.add(str(cls_id) + " " + " ".join([str(a) for a in bb]) + '\n')
-#     #         out_file.write(str(cls_id) + " " + " ".join([str(a) for a in bb]) + '\n')
-#
-#     for i in out_tmp:
-#         out_file.write(i)
-#
-#     in_file.close()
-#     out_file.close()
+def convert_annotation(label_path, xml_path):
+    try:
+        in_file = open(xml_path, 'r', encoding='utf-8')
+        out_file = open(label_path, 'w')
+        #     print(xml_path)
+        out_tmp = set()
+        tree = ET.parse(in_file)
+        root = tree.getroot()
+    except:
+        in_file = open(xml_path, 'r')
+        out_file = open(label_path, 'w')
+        #     print(xml_path)
+        out_tmp = set()
+        tree = ET.parse(in_file)
+        root = tree.getroot()
+    size = root.find('size')
+    w = int(size.find('width').text)
+    h = int(size.find('height').text)
+
+    if w <= 0 or h <= 0:
+        tmp_img_path = xml_path.split('.')[0].split('/')[-1]
+        tmp_img = cv2.imread(os.path.join(dirs, 'JPEGImages', tmp_img_path + '.jpg'))
+        h, w, c = tmp_img.shape
+
+    for obj in root.iter('object'):
+        difficult = obj.find('difficult').text
+        cls = obj.find('name').text
+        if cls not in classes or int(difficult) == 1:
+            continue
+        cls_id = classes.index(cls)
+        xmlbox = obj.find('bndbox')
+        b = (float(xmlbox.find('xmin').text), float(xmlbox.find('xmax').text), float(xmlbox.find('ymin').text),
+             float(xmlbox.find('ymax').text))
+        bb = convert((w, h), b)
+        out_tmp.add(str(cls_id) + " " + " ".join([str(a) for a in bb]) + '\n')
+        # out_file.write(str(cls_id) + " " + " ".join([str(a) for a in bb]) + '\n')
+
+    for i in out_tmp:
+        out_file.write(i)
+
+    in_file.close()
+    out_file.close()
 
 
 wd = os.getcwd()
@@ -152,7 +153,7 @@ for i in tqdm(range(0, len(list_train))):
     xml_path = os.path.join(dirs, 'Annotations', annotation_name)
 
     train_file.write(image_path + '\n')
-    # convert_annotation(label_path, xml_path)  # convert label
+    convert_annotation(label_path, xml_path)  # convert label
     new_path = os.path.join(jpg_train_dir, list_train[i])
     copy(image_path, new_path)
     copy(xml_path, os.path.join(label_dir, 'train', annotation_name))
@@ -168,7 +169,7 @@ for i in tqdm(range(0, len(list_val))):
     xml_path = os.path.join(dirs, 'Annotations', annotation_name)
 
     val_file.write(image_path + '\n')
-    # convert_annotation(label_path, xml_path)  # convert label
+    convert_annotation(label_path, xml_path)  # convert label
     new_path = os.path.join(jpg_val_dir, list_val[i])
     copy(image_path, new_path)
     copy(xml_path, os.path.join(label_dir, 'val', annotation_name))
@@ -184,7 +185,7 @@ for i in tqdm(range(0, len(list_test))):
     xml_path = os.path.join(dirs, 'Annotations', annotation_name)
 
     test_file.write(image_path + '\n')
-    # convert_annotation(label_path, xml_path)  # convert label
+    convert_annotation(label_path, xml_path)  # convert label
     new_path = os.path.join(jpg_test_dir, list_test[i])
     copy(image_path, new_path)
     copy(xml_path, os.path.join(label_dir, 'test', annotation_name))
