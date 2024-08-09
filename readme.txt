@@ -28,6 +28,8 @@ create_voc_file.py
 调用脚本，把voc格式转成yolo格式，会创建
 images 的结构
 
+生成label txt文件 yolo格式
+
 
 修改配置文件
 voc.yaml
