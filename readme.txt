@@ -1,0 +1,8 @@
+直接运行会报错
+pip install ultralytics==8.1.0
+当前环境python 3.12
+
+报错信息
+assert s in suffix, f"{msg}{f} acceptable suffix is {suffix}"
+AssertionError: mydata\weight\yolov3.weights acceptable suffix is
+
