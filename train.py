@@ -171,7 +171,7 @@ def train(hyp, opt, device, callbacks):  # hyp is path/to/hyp.yaml or hyp dictio
     # 回调，执行
     callbacks.run("on_pretrain_routine_start")
 
-    # Directories 权重目录
+    # Directories 权重目录 最好一次，和最后一次
     w = save_dir / "weights"  # weights dir
     (w.parent if evolve else w).mkdir(parents=True, exist_ok=True)  # make dir
     last, best = w / "last.pt", w / "best.pt"
@@ -622,8 +622,8 @@ def parse_opt(known=False):
     parser.add_argument("--imgsz", "--img", "--img-size", type=int, default=640, help="train, val image size (pixels)")
     # 矩形
     parser.add_argument("--rect", action="store_true", help="rectangular training")
-    # 重新开始
-    parser.add_argument("--resume", nargs="?", const=True, default=False, help="resume most recent training")
+    # 重新开始 恢复训练
+    parser.add_argument("--resume", nargs="?", const=True, default=True, help="resume most recent training")
     # 存储规则，最后校验点才报错
     parser.add_argument("--nosave", action="store_true", help="only save final checkpoint")
     # 最后一代 才校验

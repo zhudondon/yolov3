@@ -43,3 +43,39 @@ you can set the environment variable KMP_DUPLICATE_LIB_OK=TRUE to allow the prog
 
 解决
 os.environ['KMP_DUPLICATE_LIB_OK']='TRUE'
+
+
+训练提示
+Comet: run 'pip install comet_ml' to automatically track and visualize YOLOv3  runs in Comet
+TensorBoard: Start with 'tensorboard --logdir runs\train', view at http://localhost:6006/
+
+models.common.Conv
+
+
+
+1.中断恢复学习
+pretrained，resume
+
+ # 预训练权重 通过这个来判断是否预训练，就是说是否存在 权重文件
+    pretrained = weights.endswith(".pt")
+
+     # 重新开始 恢复训练 改为true即可
+    parser.add_argument("--resume", nargs="?", const=True, default=False, help="resume most recent training")
+
+Transferred 71/71 items from runs\train\exp3\weights\last.pt
+Resuming training from runs\train\exp3\weights\last.pt from epoch 2 to 100 total epochs
+
+
+
+
+2.迁移学习，冻结层数
+freeze
+
+   # 冻结 层数，自己训练自己的参数
+    parser.add_argument("--freeze", nargs="+", type=int, default=[0], help="Freeze layers: backbone=10, first3=0 1 2")
+
+    可以看下 yolo原网络的层数 ，新增自己的网络层 因为这里没有新增网络层，所以就不进行测试了，也可以在原有基础上，减少层数训练
+
+
+3.结合tensorboard
+tensorboard --logdir=D:\Users\86159\PycharmProjects\yolov3\runs
