@@ -25,6 +25,7 @@ from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
 
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 try:
     import comet_ml  # must be imported before torch (if installed)
 except ImportError:
@@ -37,6 +38,8 @@ import torch.nn as nn
 import yaml
 from torch.optim import lr_scheduler
 from tqdm import tqdm
+
+
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv3 root directory
@@ -93,6 +96,7 @@ from utils.torch_utils import (
     smart_resume,
     torch_distributed_zero_first,
 )
+
 
 LOCAL_RANK = int(os.getenv("LOCAL_RANK", -1))  # https://pytorch.org/docs/stable/elastic/run.html
 RANK = int(os.getenv("RANK", -1))
@@ -167,7 +171,7 @@ def train(hyp, opt, device, callbacks):  # hyp is path/to/hyp.yaml or hyp dictio
     # 回调，执行
     callbacks.run("on_pretrain_routine_start")
 
-    # Directories 权重目录
+    # Directories 权重目录 最好一次，和最后一次
     w = save_dir / "weights"  # weights dir
     (w.parent if evolve else w).mkdir(parents=True, exist_ok=True)  # make dir
     last, best = w / "last.pt", w / "best.pt"
@@ -618,8 +622,8 @@ def parse_opt(known=False):
     parser.add_argument("--imgsz", "--img", "--img-size", type=int, default=640, help="train, val image size (pixels)")
     # 矩形
     parser.add_argument("--rect", action="store_true", help="rectangular training")
-    # 重新开始
-    parser.add_argument("--resume", nargs="?", const=True, default=False, help="resume most recent training")
+    # 重新开始 恢复训练
+    parser.add_argument("--resume", nargs="?", const=True, default=True, help="resume most recent training")
     # 存储规则，最后校验点才报错
     parser.add_argument("--nosave", action="store_true", help="only save final checkpoint")
     # 最后一代 才校验
@@ -647,7 +651,7 @@ def parse_opt(known=False):
     # 使用同步 批量正则化，只支持在分布式环境
     parser.add_argument("--sync-bn", action="store_true", help="use SyncBatchNorm, only available in DDP mode")
     # 多线程数据加载器 分布式环境 这里多线程要少一点，不然容易崩 DLL load failed while importing _cdflib: 页面文件太小，无法完成操作
-    parser.add_argument("--workers", type=int, default=4, help="max dataloader workers (per RANK in DDP mode)")
+    parser.add_argument("--workers", type=int, default=8, help="max dataloader workers (per RANK in DDP mode)")
     # 项目根目录
     parser.add_argument("--project", default=ROOT / "runs/train", help="save to project/name")
     # 项目名称
@@ -958,7 +962,6 @@ def run(**kwargs):
         setattr(opt, k, v)
     main(opt)
     return opt
-
 
 if __name__ == "__main__":
     """
